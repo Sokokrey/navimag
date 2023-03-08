@@ -1,0 +1,233 @@
+/** TAMAÑOS **/
+$ancho: 100%;
+$margin: 10px;
+$padding: 10px;
+$bloque: $ancho / 12;
+
+@mixin circle($size) {
+  $ratio: 10px;
+  min-width: 0;
+  width: $ratio * $size;
+  height: $ratio * $size;
+  border-radius: 50%;
+  border-width: 0px;
+  margin: 0;
+  padding: 0;
+  float: left;
+  cursor: pointer;
+}
+
+/** COLORES **/
+$color-primary: steelblue;
+$color-secondary: gray;
+$color-success: limegreen;
+$color-info: dodgerblue;
+$color-warning: orange;
+$color-danger: red;
+$body-background: rgba(0, 22, 41, 0.8);
+$card-background: rgba(0, 0, 0, 0.15);
+$menu-background: #00395d;
+$card-border: rgba(255, 255, 255, 0.1);
+$card-hover: rgba(0, 0, 0, 0.15);
+$text-color: #ffffffaa;
+$text-hover: $color-primary;
+
+$title-color: #ffffffaa;
+
+mat-form-field {
+  width: $ancho;
+}
+/** COMPONENTES **/
+mat-card,
+mat-expansion-panel {
+  background-color: $card-background;
+  border: 1px solid $card-border;
+  color: $text-color;
+  mat-card-header {
+    mat-card-title {
+      color: $title-color;
+    }
+  }
+}
+mat-card, table {
+  margin-top: 25px;
+}
+::ng-deep .mat-slide-toggle-content{
+  overflow: inherit !important;
+}
+
+.bg-menu {
+  background-color: $menu-background;
+  color: white;
+}
+.bg-primary {
+  background-color: $color-primary;
+  color: white;
+}
+.bg-secondary {
+  background-color: $color-secondary;
+  color: white;
+}
+.bg-success {
+  background-color: $color-success;
+  color: white;
+}
+.bg-info {
+  background-color: $color-info;
+  color: white;
+}
+.bg-warning {
+  background-color: $color-warning;
+  color: white;
+}
+.bg-danger {
+  background-color: $color-danger;
+  color: white;
+}
+.bg-trasparent{
+  background-color: $card-background;
+  color: white;
+}
+.color-primary {
+  color: $color-primary;
+}
+.color-secondary {
+  color: $color-secondary;
+}
+.color-success {
+  color: $color-success;
+}
+.color-info {
+  color: $color-info;
+}
+.color-warning {
+  color: $color-warning;
+}
+.color-danger {
+  color: $color-danger;
+}
+.circle-1 {
+  @include circle(1);
+}
+.circle-2 {
+  @include circle(1.5);
+}
+.circle-3 {
+  @include circle(2);
+}
+.circle-4 {
+  @include circle(2.5);
+}
+.circle-5 {
+  @include circle(3);
+}
+.circle-6 {
+  @include circle(3.5);
+}
+.circle-7 {
+  @include circle(4);
+}
+.circle-8 {
+  @include circle(4.5);
+}
+.circle-9 {
+  @include circle(5);
+}
+.circle-10 {
+  @include circle(5.5);
+}
+.circle-11 {
+  @include circle(6);
+}
+.circle-12 {
+  @include circle(6.5);
+}
+.circle-13 {
+  @include circle(7);
+}
+.circle-14 {
+  @include circle(7.5);
+}
+.circle-15 {
+  @include circle(8);
+}
+.circle-16 {
+  @include circle(8.5);
+}
+.circle-17 {
+  @include circle(9);
+}
+.circle-18 {
+  @include circle(9.5);
+}
+.circle-19 {
+  @include circle(10);
+}
+.circle-20 {
+  @include circle(10.5);
+}
+.circle-21 {
+  @include circle(11);
+}
+.circle-22 {
+  @include circle(11.5);
+}
+.circle-23 {
+  @include circle(12);
+}
+.circle-24 {
+  @include circle(12.5);
+}
+.circle-25 {
+  @include circle(13);
+}
+.circle-26 {
+  @include circle(13.5);
+}
+.circle-27 {
+  @include circle(14);
+}
+.circle-28 {
+  @include circle(14.5);
+}
+.circle-29 {
+  @include circle(15);
+}
+.circle-30 {
+  @include circle(15.5);
+}
+.circle-31 {
+  @include circle(16);
+}
+.circle-32 {
+  @include circle(16.5);
+}
+.circle-33 {
+  @include circle(17);
+}
+.circle-34 {
+  @include circle(17.5);
+}
+.full-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.transparent {
+  background-color: transparent;
+  border: solid 2px;
+}  
+h1,h2,h3,h4,h5,h6,th{
+  color:$title-color;
+}
+table, mat-paginator {
+  width:100%;
+  background-color: $card-background;
+}
+.mat-menu-item{
+  text-align: center;
+  justify-content: center;
+}
+::ng-deep .warning-snackbar{  
+  background-color: #dd5414b0;
+}

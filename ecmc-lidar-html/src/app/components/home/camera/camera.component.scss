@@ -1,0 +1,17 @@
+@import "./src/saut";
+
+canvas{
+    height: 90px;
+    width:100%;
+    display: block; 
+    margin: auto;
+}
+canvas:hover{
+    opacity: 0.85;
+}
+
+.canvas_list {
+    border: 5px solid #181235;
+    position:absolute; 
+    z-index: 2;
+}

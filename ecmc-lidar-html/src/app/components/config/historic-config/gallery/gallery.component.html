@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col s12 m12 l12 xl12">
+        <span class="column" *ngFor="let file of data.files">
+            <img src="{{ file.image }}" alt="Nature" (click)="expandImage(file)">
+        </span>
+    </div>
+    <div class="col s12 m12 l12 xl12" [hidden]="imgExpanded">
+            <!-- The expanding image container -->
+        <div class="container">
+            <!-- Close the image -->
+            <span (click)="imgExpanded = true" class="closebtn">&times;</span>
+        
+            <!-- Expanded image -->
+            <img id="expandedImg" style="width:100%">
+        
+            <!-- Image text -->
+            <div id="imgtext"></div>
+        </div>
+    </div>    
+</div>

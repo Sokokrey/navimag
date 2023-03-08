@@ -1,0 +1,54 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav-content>
+        <mat-toolbar class="bg-menu">
+            <img src="./assets/logo-navimag.png" style="height:50px;" alt="NaviMag">
+            <span class="example-spacer hide-on-small-only"></span>
+            <section class="hide-on-small-only" style="margin-right : 30px">
+                <table style="margin : 0px; background-color: transparent;">
+                    <tr>
+                        <td align="center">
+                            <h4 ><fa-icon [icon]="faUser" style="color: #4db746"></fa-icon>
+                                Usuario: <i>{{login.user}}</i>&nbsp;
+                            </h4>
+                        </td>  
+                        <td align="center">
+                            <h4 style="margin-left : 30px; ">{{ (now | date : 'MMMM').charAt(0).toUpperCase() + (now | date : 'MMMM d, y HH:mm:ss').toString().slice(1) }}</h4>
+                        </td>    
+                    </tr>
+                    <tr *ngIf="login.category != 3">
+                        <td colspan="2" align="center">
+                            <span [ngClass]="{'sombrita': sensorStatus, 'peligro': !sensorStatus}" >
+                            {{ sensorStatus ? 'CONECTADO' : 'DESCONECTADO'}}</span>
+                        </td>    
+                    </tr>    
+                </table>
+            </section>    
+            <button *ngIf="notifications.length > 0" matBadge="{{ notificationsCont }}" class="circle-4 transparent" style="border : 0px" mat-raised-button matBadgeColor="warn"
+                [matBadgeHidden]="isBadgeHidden" (click)="isBadgeHidden = true; notificationsCont = 0; clearNotifications()" [matMenuTriggerFor]="menu">
+                <fa-icon [icon]="faBell" size="2x" style="color : #f9ff00f2"></fa-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+                <span *ngFor="let notification of notifications.reverse()" mat-menu-item>{{ notification.message }}</span>
+            </mat-menu>
+            <button mat-icon-button routerLink="" class="hide-on-small-only">
+                <fa-icon [icon]="faHome" [ngStyle]="{'color': (router.url == '/') ? '#69e687' : ''}"></fa-icon>
+            </button>
+            <button *ngIf="login.category == 1" mat-icon-button routerLink="/shipper" class="hide-on-small-only">
+                <fa-icon [icon]="faShip" [ngStyle]="{'color': (router.url == '/shipper') ? '#69e687' : ''}"></fa-icon>
+            </button>
+            <button mat-icon-button routerLink="/config" class="hide-on-small-only" *ngIf="login.category != 3">
+                <fa-icon [icon]="faCog" [ngStyle]="{'color': (router.url == '/config') ? '#69e687' : ''}"></fa-icon>
+            </button>
+            <button mat-icon-button (click)="loginService.logout()" class="hide-on-small-only color-primary">  
+                <fa-icon [icon]="faSignOutAlt" ></fa-icon>
+            </button>
+        </mat-toolbar>
+        <!-- Add Content Here -->
+        <div id="style-1" class="scrollbar">
+            <div class="force-overflow">
+                <ng-content></ng-content>
+            </div>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>
+

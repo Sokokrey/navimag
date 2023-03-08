@@ -1,0 +1,76 @@
+@import "../../../saut";
+
+.centered {
+  position: absolute;
+  top: 42%;
+  left: 47%;
+  transform: translate(-50%, -50%);
+} 
+.fading-alert {
+  margin: center;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  color: white;
+  text-transform: uppercase;
+  animation: alert 0.5s ease-in-out infinite alternate;
+  text-align: center;
+}
+
+.fading-glow {
+  margin: 0;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  color: white;
+  text-transform: uppercase;
+  animation: glow 4s ease-in-out infinite alternate;
+  text-align: center;
+}
+
+.fading-busy {
+  margin: 0;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  color: white;
+  text-transform: uppercase;
+  animation: busy 4s ease-in-out infinite alternate;
+  text-align: center; 
+}
+
+.zoomedCamera {
+  z-index: 2;
+  top: 13%;
+  left: 22%;
+  position: absolute;
+  width: 50%;
+}
+
+@keyframes alert {
+  from {
+    text-shadow: 0 0 20px rgb(255, 91, 91);
+  }
+  to {
+    text-shadow: 0 0 30px #e21111, 0 0 10px #ff5a5a;
+    color: #ff0000;
+  }
+}
+@keyframes busy {
+  from {
+    text-shadow: 0 0 20px white;
+  }
+  to {
+    text-shadow: 0 0 30px #fbe200, 0 0 10px #f1f35c;
+    color: #e6ec94;
+  }
+}
+@keyframes glow {
+  from {
+    text-shadow: 0 0 20px white;
+  }
+  to {
+    text-shadow: 0 0 30px #15bf15, 0 0 10px #81eb81;
+    color: #232423;
+  }
+}

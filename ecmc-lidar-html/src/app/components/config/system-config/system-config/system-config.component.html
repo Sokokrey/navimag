@@ -1,0 +1,12 @@
+<div class="row" style="text-align: center;">
+    <div style=" display:inline-block; margin-top: 100px;">  
+        <mat-list #list *ngFor="let card of infoCards" >
+            <mat-list-item>
+                <div matLine>
+                    <p style="float:left; margin-right: 140px;">{{ card.name }}</p>
+                    <p style="float:right">{{ card.value }}</p>
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </div>    
+</div>

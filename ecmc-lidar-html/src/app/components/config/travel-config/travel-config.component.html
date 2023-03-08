@@ -1,0 +1,160 @@
+<div class="row" [style.margin-top]="'20px'">
+    <div class="col s12 m110 l10 xl10" >
+        <form [formGroup]="formGroup" #formDirective="ngForm" class="form">
+            <div class="col s1 m1 l1 xl1">
+                <mat-form-field class="form-element">
+                <input matInput type="number" [(ngModel)]="travel.num" placeholder="Viaje" formControlName="travel" autocomplete="off" (input)="searchTravels()">
+                <mat-error *ngIf="!formGroup.controls['travel'].valid && formGroup.controls['travel'].touched"> 
+                    {{ getErrorRequired('travel') }}
+                </mat-error>
+                </mat-form-field>
+            </div>  
+            <div class="col s2 m2 l2 xl2">
+                <mat-form-field class="form-element">
+                    <mat-select formControlName="ferry" [(ngModel)]="travel.ferry" placeholder="Nave">
+                    <mat-option *ngFor="let f of ferries" [value]="f.name">{{ f.name }}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="!formGroup.controls['ferry'].valid && formGroup.controls['ferry'].touched" > 
+                    {{ getErrorRequired('ferry') }}
+                    </mat-error>
+                </mat-form-field>
+                </div>
+            <div class="col s6 m2 l2 xl2">
+                <mat-form-field class="form-element">
+                    <mat-select placeholder="Terminal Embarque" formControlName="terminal_embarque" [(ngModel)]="travel.terminal_embarque">
+                    <mat-option *ngFor="let terminal of terminalList" [value]="terminal.name" [disabled]="travel.terminal_destino == terminal.name">
+                        {{ terminal.name }}</mat-option>
+                    </mat-select>
+                    <mat-error> {{ getErrorRequired('terminal_embarque') }} </mat-error>
+                </mat-form-field>
+                </div> 
+                <div class="col s6 m2 l2 xl2">
+                <mat-form-field>
+                    <mat-select placeholder="Terminal Destino" formControlName="terminal_destino" [(ngModel)]="travel.terminal_destino">
+                        <mat-option *ngFor="let terminal of terminalList" [value]="terminal.name" [disabled]="travel.terminal_embarque == terminal.name">
+                            {{ terminal.name }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error> {{ getErrorRequired('terminal_destino') }} </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col s4 m2 l2 xl2">
+                <mat-form-field class="form-element">
+                    <input matInput [matDatepicker]="zarpe" [min]="today" [ngModel]="travel.zarpe" placeholder="Zarpe" formControlName="zarpe" autocomplete="off" readonly="readonly">
+                    <mat-datepicker-toggle [for]="zarpe" matSuffix></mat-datepicker-toggle>
+                    <mat-datepicker #zarpe></mat-datepicker> 
+                    <mat-error *ngIf="!formGroup.controls['zarpe'].valid && formGroup.controls['zarpe'].touched"> 
+                    {{ getErrorRequired('zarpe') }} </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col s2 m1 l1 xl2">
+                <button mat-raised-button (click)="updateTravel ? updTravel(formDirective) : addTravel(formDirective);" class="circle-8 transparent color-primary">
+                    <fa-icon [icon]="faSave"></fa-icon>
+                </button>
+            </div>
+            <div class="col s2 m1 l1 xl2"> 
+                <button mat-raised-button (click)="resetTravel();" class="circle-8 transparent color-info">
+                    <fa-icon [icon]="faBan"></fa-icon>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col s10 m10 l10 xl10">
+        <table mat-table [dataSource]="ds_travels">
+            <ng-container matColumnDef="travel">
+                <th mat-header-cell *matHeaderCellDef>Nro Viaje</th>
+                <td mat-cell *matCellDef="let travel">{{ travel.num }}</td>
+            </ng-container>
+            <ng-container matColumnDef="ferry">
+                <th mat-header-cell *matHeaderCellDef>Nave</th>
+                <td mat-cell *matCellDef="let travel">{{ travel.ferry }}</td>
+            </ng-container>
+            <ng-container matColumnDef="ruta">
+                <th mat-header-cell *matHeaderCellDef>Ruta</th>
+                <td mat-cell *matCellDef="let travel">{{ travel.terminal_embarque }} - {{ travel.terminal_destino }}</td>
+            </ng-container>
+            <ng-container matColumnDef="zarpe">
+                <th mat-header-cell *matHeaderCellDef>Zarpe</th>
+                <td mat-cell *matCellDef="let travel">{{ travel.zarpe | date:'d-MM-y':'UTC' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado
+                    <mat-select placeholder="Mostrar..." [(ngModel)]="sortScans">
+                        <mat-option (onSelectionChange)="sortScansByState($event)" [value]="0">Todos</mat-option>
+                        <mat-option (onSelectionChange)="sortScansByState($event)" [value]="1">En asignación</mat-option>
+                        <mat-option (onSelectionChange)="sortScansByState($event)" [value]="2">En Ruta</mat-option>
+                        <mat-option (onSelectionChange)="sortScansByState($event)" [value]="3">Finalizado</mat-option>
+                    </mat-select>
+                </th>
+                <td mat-cell *matCellDef="let travel">{{ travel.estado }}</td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let travel">
+                    <button mat-raised-button (click)="delTravel(travel)" class="circle-8 transparent color-danger">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+                    <button mat-raised-button (click)="getTravelDetail(travel)" class="circle-8 transparent color-warning">
+                        <fa-icon [icon]="faEdit"></fa-icon>
+                    </button>
+                </td>  
+            </ng-container>
+            <tr mat-header-row
+                *matHeaderRowDef="['travel','ferry','ruta','zarpe', 'estado', 'actions']"></tr>
+            <tr mat-row
+                *matRowDef="let travel; columns: ['travel','ferry','ruta','zarpe', 'estado', 'actions']">
+            </tr>
+        </table>
+        <mat-paginator #travelPaginator [pageSize]="500"></mat-paginator>  
+    </div>
+    <div class="col s12 m12 l12 xl12" *ngIf="travelScansList.length > 0">
+        <mat-card>
+            <mat-card-title><h2>Cargas del viaje</h2></mat-card-title>
+            <mat-card-content>
+                <div class="col s12 m12 l12 xl12">
+                    <div class="col s3 m3 l3 xl3">
+                        <mat-form-field>
+                            <input matInput class="form-field" [formControl]="nroRecepcionFilter" placeholder="Filtro por n° de recepcion">
+                        </mat-form-field>
+                    </div>
+                    <div class="col s3 m3 l3 xl3">
+                        <mat-form-field>
+                            <input matInput class="form-field" [formControl]="patenteFilter" placeholder="Filtro por patente">
+                        </mat-form-field>
+                    </div>
+                </div>
+                <table mat-table [dataSource]="ds_travelScans">
+                    <ng-container matColumnDef="nro_recepcion">
+                        <th mat-header-cell *matHeaderCellDef>Nro Recepcion</th>
+                        <td mat-cell *matCellDef="let scan">{{ scan.nro_recepcion }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="patente">
+                        <th mat-header-cell *matHeaderCellDef>Patente</th>
+                        <td mat-cell *matCellDef="let scan">{{ scan.patente }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="customer_name">
+                        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                        <td mat-cell *matCellDef="let scan">{{ scan.customer.name }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="customer_rut">
+                        <th mat-header-cell *matHeaderCellDef>RUT Cliente</th>
+                        <td mat-cell *matCellDef="let scan">{{ scan.customer.RUT }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="load">
+                        <th mat-header-cell *matHeaderCellDef>Carga</th>
+                        <td mat-cell *matCellDef="let scan">{{ scan.equipo }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="fecha">
+                        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                        <td mat-cell *matCellDef="let scan">{{ scan.fecha | date:'d-MM-y':'UTC' }}</td>
+                    </ng-container>
+                    <tr mat-header-row
+                        *matHeaderRowDef="displayColumns"></tr>
+                    <tr mat-row
+                        *matRowDef="let scan; columns: displayColumns">
+                    </tr>
+                </table>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

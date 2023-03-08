@@ -1,0 +1,276 @@
+<div class="row">
+  <div class="col s12 m12 l12 xl12">
+    <mat-tab-group #tabGroup mat-stretch-tabs >
+      <mat-tab label="Scanner">
+        <button class="lateral-camera-icon" mat-button (click)="cameraChart()" >
+          <fa-icon [icon]=faCamera size=4x></fa-icon>
+        </button>
+        <div class="lateral-camera-div" style="z-index: 0" [hidden]="hiddenL">
+          <canvas #streamingL id="canvasL" [(ngModel)]="playerL" (click)="zoomCameraL()" ngDefaultControl></canvas>
+        </div>
+        <mat-card style="margin-top: 3px;" *ngIf="chartOptions.series" height="50px">
+          <mat-card-content height="50px">
+            <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [oneToOne]=true [update]="chartUpdate" ></highcharts-chart>
+           </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <mat-tab label="Formulario">
+        <form [formGroup]="formGroup" #formDirective="ngForm" (ngSubmit)="save(formDirective)" class="form">
+          <div class="col s12 m12 l12 xl12 center">
+            <mat-card style="margin: 0 auto; padding-bottom: 0px;">
+              <mat-card-title>DATOS DEL VEHÍCULO</mat-card-title>
+              <mat-card-content>
+                <div class="row">
+                  <div class="col s8 m2 l2 xl2">
+                    <mat-form-field class="form-element">
+                      <input matInput type="number" formControlName="nro_reserva" [(ngModel)]="nro_reserva"
+                        placeholder="Nro reserva" autocomplete="off" [attr.disabled]="sin_reserva ? true : null" min="1"> 
+                      <mat-error
+                        *ngIf="!formGroup.controls['nro_reserva'].valid && formGroup.controls['nro_reserva'].touched">
+                        {{ getErrorNro_reserva() }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col s4 m1 l1 xl1" style="padding: 15px 0 0 0">
+                    <mat-checkbox formControlName="sin_reserva" [(ngModel)]="sin_reserva" (change)="formGroup.controls['nro_reserva'].reset();">
+                      S.R
+                    </mat-checkbox>
+                  </div>
+                  <div class="col s6 m3 l3 xl3">
+                    <div class="col s12 m12 l12 xl12">
+                      <mat-form-field class="form-element">
+                        <input matInput type="text" formControlName="patente" style="text-transform: uppercase;" (blur)="patente = agregarGuion($event.target.value)" (change)="patenteExist()" 
+                        [(ngModel)]="patente" placeholder="Patente" [matAutocomplete]="patenteAuto" [attr.disabled]="sin_patente ? true : null">
+                        <mat-autocomplete #patenteAuto="matAutocomplete" (optionSelected)="patenteExist()" style="min-width: 359px !important;">
+                          <mat-option *ngFor="let patente of filteredPatente | async | slice : 0 : 5" [value]="patente">
+                            {{ patente }}
+                          </mat-option>
+                        </mat-autocomplete>
+                        <mat-error *ngIf="!formGroup.controls['patente'].valid && formGroup.controls['patente'].touched">
+                          {{ getErrorPatente() }}
+                        </mat-error>
+                      </mat-form-field> 
+                    </div>
+                    <div class="col s12 m12 l12 xl12" [hidden]="showPatente2()">
+                      <mat-form-field class="form-element" >
+                        <input matInput type="text" formControlName="patente2" style="text-transform: uppercase;" (blur)="patente2 = agregarGuion($event.target.value)" autocomplete="off" [(ngModel)]="patente2" placeholder="Patente Opcional">
+                      </mat-form-field>  
+                    </div>
+                  </div>
+                  <div class="col s4 m1 l1 xl1" style="padding: 15px 0 0 0">
+                    <mat-checkbox formControlName="sin_patente" [(ngModel)]="sin_patente" 
+                      (change)="formGroup.controls['patente'].reset(); formGroup.controls['patente2'].reset();">S.P</mat-checkbox>
+                  </div>
+                  <div class="col s6 m3 l3 xl3">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="driver.name" placeholder="Nombre del Chofer" formControlName="driver_name" (change)="driverExist()" style="text-transform: uppercase;" [matAutocomplete]="driverNameAuto">
+                      <mat-autocomplete #driverNameAuto="matAutocomplete">
+                        <mat-option (onSelectionChange)="driver.name = d.name; driver.RUT = d.RUT" *ngFor="let d of filteredDriverName | async | slice : 0 : 5" [value]="d.name">
+                          {{ d.name }}
+                        </mat-option>
+                      </mat-autocomplete>
+                      <mat-error *ngIf="!formGroup.controls['driver_name'].valid && formGroup.controls['driver_name'].touched"> 
+                        {{ getErrorDriver() }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col s6 m2 l2 xl2">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="driver.RUT" placeholder="RUT Chofer" formControlName="driver_rut" (change)="driverExist()" [matAutocomplete]="driverRUTAuto" autocomplete="off">
+                      <mat-autocomplete #driverRUTAuto="matAutocomplete">
+                        <mat-option (onSelectionChange)="driver.RUT = d.RUT; driver.name = d.name;" *ngFor="let d of filteredDriverRUT | async | slice : 0 : 5" [value]="d.RUT">
+                          {{ d.RUT }}
+                        </mat-option>
+                      </mat-autocomplete>
+                      <mat-error *ngIf="!formGroup.controls['driver_rut'].valid && formGroup.controls['driver_rut'].touched"> 
+                        {{ getErrorDriverRUT() }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>  
+                <div class="row">
+                  <div class="col s6 m2 l2 xl2">
+                    <mat-form-field class="form-element"> 
+                      <mat-select formControlName="load_type" [(ngModel)]="load_type" placeholder="Tipo de Equipo" (selectionChange)="getLoads()">
+                        <mat-option *ngFor="let load_type of loadTypeList" [value]="load_type" >
+                          {{ load_type.name }}</mat-option>
+                      </mat-select>
+                      <mat-error> {{ getErrorRequired('load_type') }} </mat-error> 
+                    </mat-form-field>
+                  </div>
+                  <div class="col s6 m2 l2 xl2" *ngIf="load_type.loads.length > 0">
+                    <mat-form-field class="form-element">
+                      <mat-select formControlName="load" [(ngModel)]="load" placeholder="Equipo">
+                        <mat-option *ngFor="let load of filterLoads" [value]="load" >{{ load.name }}</mat-option>
+                      </mat-select>
+                      <mat-error> {{ getErrorRequired('load') }} </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col s6 m3 l3 xl3">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="dice_tener.name" placeholder="Dice tener" formControlName="dice_tener" style="text-transform: uppercase;" [matAutocomplete]="dice_tenerAuto">
+                      <mat-autocomplete #dice_tenerAuto="matAutocomplete">
+                        <mat-option (onSelectionChange)="dice_tener.name = d_t.name" *ngFor="let d_t of filteredDice_tener | async | slice : 0 : 5" [value]="d_t.name">
+                          {{ d_t.name }}
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                  <div class="col s4 m2 l2 xl2" style="padding: 3px 0 0 0">
+                    <mat-checkbox formControlName="carga_peligrosa" [(ngModel)]="carga_peligrosa" style="text-align: left;">Carga <br>Peligrosa</mat-checkbox>
+                  </div>
+                  <div class="col s4 m1 l1 xl1" style="padding: 3px 0 0 0" >
+                    <mat-checkbox formControlName="repuesto_neumatico" [(ngModel)]="repuesto_neumatico.lleva" style="text-align: left;" 
+                    (change)="(!repuesto_neumatico.lleva) ? repuesto_neumatico.cuantos = 0 : ''">Repuesto <br>Neumático</mat-checkbox>
+                  </div>
+                  <div class="col s1 m1 l1 xl1" *ngIf="repuesto_neumatico.lleva" style="margin-left:20px">
+                    <mat-form-field class="form-element" >
+                      <input matInput type="number" formControlName="numero_neumaticos" [(ngModel)]="repuesto_neumatico.cuantos" 
+                      (focus)="(repuesto_neumatico.cuantos == 0) ? repuesto_neumatico.cuantos = '' : ''" placeholder="Cuantos">
+                    </mat-form-field>  
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s3 m2 l2 xl2">
+                    <mat-form-field class="form-element">
+                      <input matInput type="number" [(ngModel)]="travel.num" placeholder="Viaje" formControlName="travel" autocomplete="off">
+                      <mat-error *ngIf="!formGroup.controls['travel'].valid && formGroup.controls['travel'].touched"> 
+                        {{ getErrorTravel() }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col s6 m2 l2 xl3" *ngIf="travelExist(travel.num)">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="travel.ferry" [ngModelOptions]="{standalone: true}" placeholder="Nave" readonly="readonly">
+                    </mat-form-field>  
+                  </div>
+                  <div class="col s6 m3 l2 xl2" *ngIf="travelExist(travel.num)">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="travel.terminal_embarque" [ngModelOptions]="{standalone: true}" placeholder="Terminal Emabarque" readonly="readonly">
+                    </mat-form-field>    
+                  </div>  
+                  <div class="col s6 m3 l2 xl2" *ngIf="travelExist(travel.num)">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="travel.terminal_destino" [ngModelOptions]="{standalone: true}" placeholder="Terminal Destino" readonly="readonly">
+                    </mat-form-field>    
+                  </div>
+                  <div class="col s4 m2 l2 xl2" *ngIf="travelExist(travel.num)">
+                    <mat-form-field class="form-element">
+                      <input matInput [(ngModel)]="travel.zarpe" [ngModelOptions]="{standalone: true}" placeholder="Zarpe"  autocomplete="off" readonly="readonly">
+                    </mat-form-field>    
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s6 m6 l3 xl3">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="customer.name" placeholder="Cliente Embarcador" formControlName="customer_name" (change)="customerExist()" style="text-transform: uppercase;" [matAutocomplete]="customerAuto" autocomplete="off">
+                      <mat-autocomplete #customerAuto="matAutocomplete">
+                        <mat-option (onSelectionChange)="customer.name = c.name; customer.RUT = c.RUT;" *ngFor="let c of filteredCustomers | async | slice : 0 : 5" [value]="c.name">
+                          {{ c.name }}
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                  <div class="col s6 m4 l2 xl2">
+                    <mat-form-field class="form-element">
+                      <input matInput type="text" [(ngModel)]="customer.RUT" placeholder="RUT Embarcador" formControlName="customer_rut" (change)="customerExist()">
+                      <mat-error *ngIf="!formGroup.controls['customer_rut'].valid && formGroup.controls['customer_rut'].touched"> 
+                        {{ getErrorCustomerRUT() }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s12 m12 l12 xl12" style="padding: 20px 0 0 20px">
+                    <mat-select #conditionalSelect placeholder="Condicionales" multiple>
+                      <mat-checkbox [(ngModel)]="allConditionalsSelected" type="checkbox" [ngModelOptions]="{standalone: true}" (change)="toggleAllConditionalSelection()">Seleccionar Todas</mat-checkbox> 
+                      <mat-option (click)="conditionalClick()" *ngFor="let conditional of conditionalList" >
+                        {{conditional}}
+                      </mat-option>
+                    </mat-select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s12 m6 l5 xl5">
+                    <mat-form-field class="form-element">
+                      <mat-label>Observaciones Recepción</mat-label>
+                      <textarea matInput formControlName="observaciones_recepcion" placeholder="Escriba una observación..." [(ngModel)]="observaciones_recepcion" autocomplete="off"></textarea>
+                    </mat-form-field>
+                  </div>  
+                  <div class="col s12 m6 l5 xl5">
+                    <mat-form-field class="form-element">
+                      <mat-label>Observaciones Destino</mat-label>
+                      <textarea matInput formControlName="observaciones_destino" placeholder="Escriba una observación..." [(ngModel)]="observaciones_destino" autocomplete="off"></textarea>
+                    </mat-form-field>
+                  </div>  
+                </div>
+                <div class="row">
+                  <div style="margin-bottom: 2px;" class="col s12 m12 l12 xl12 parpadea" *ngIf="!formConfirmado">
+                    <button type="button" mat-button (click)="confirmarMedidas()" class="color-success">
+                      <fa-icon [icon]="faCheck" size=3x></fa-icon><br>
+                      Confirmar
+                    </button>
+                  </div>
+                  <div style="margin-bottom: 2px;" class="col s12 m12 l12 xl12" *ngIf="formConfirmado" [hidden]="showGif">
+                    <button type="submit" mat-button >
+                      <fa-icon [icon]="faSave" size=3x></fa-icon><br>
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </form>
+      </mat-tab>  
+    </mat-tab-group>
+    <div *ngIf="showGif">
+      <div class="row" id="checkGif">
+        <img src="assets/check.gif">
+        <br>
+        <span><i>Listo! Generando reporte...</i></span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">  
+  <div class="col s12 m12 l12 xl12">
+    <mat-card @fade style="margin-top: 0px;">
+      <mat-card-content >
+        <div class="d-flex justify-content-center">
+          <div class="block"><p >Largo <small>(m)</small></p>
+            <div @fade class="counter" *ngIf="largo > 0 || 'isNaN(largo)'">
+              <input matInput class="peo" type="text" [(ngModel)]="largo" (change)="changeLarge(largo)">
+            </div>
+            <div class="parpadea" *ngIf="largo === 0">Seleccione puntos</div>
+          </div>
+          <div class="block"><p>Alto <small>(m)</small></p>
+            <div @fade class="counter">
+              <input matInput type="text" [(ngModel)]="alto" (change)="changeAlto(alto)">
+            </div>
+            <div class="parpadea" *ngIf="alto > r_alto">Calculando...</div>
+          </div>
+          <div class="block"><p>Ancho <small>(m)</small></p>
+            <div @fade class="counter">
+              <input matInput type="text" [(ngModel)]="ancho" (change)="changeAncho(ancho)">
+            </div>
+            <div  class="parpadea" *ngIf="alto > r_alto">Calculando...</div>
+          </div>
+          <div class="block"><p>Volumen <small>(m³)</small></p>
+            <div @fade class="counter" *ngIf="volumen == r_volumen">
+              <input matInput type="text" [(ngModel)]="r_volumen" disabled>
+            </div>
+            <div class="parpadea" *ngIf="largo === 0">Seleccione puntos</div>
+            <div class="parpadea" *ngIf="volumen != r_volumen">Calculando...</div>
+          </div>
+          <div class="block"><p>Peso <small>(kg)</small></p>  
+            <div @fade class="counter">
+              <input matInput type="text" [(ngModel)]="peso" (change)="changeWeight(peso)">
+            </div>
+            <div class="parpadea" *ngIf="peso === 0 || !peso">Ingrese pesaje</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>      
+</div>

@@ -1,0 +1,119 @@
+<app-main-nav (sensorStatus_msg)="sensorStatus = $event">
+  <div class="row">
+    <div class="col s12 m2 l2 xl2 center">
+      <mat-card>
+        <mat-card-title>ESTADO GENERAL</mat-card-title>  
+        <mat-card-content>
+          <div class="row center">
+            <div class="col s12 m6 l12 xl12">    
+              <mat-slide-toggle color="warn">
+                Pesaje Automático
+              </mat-slide-toggle>
+            </div>  
+          </div>  
+          <div class="row">
+            <div class="col s6 m6 l6 xl6">
+              <p>Semáforo:</p>
+            </div>
+            <div class="col s6 m6 l6 xl6">
+              <fa-icon [icon]="faCircle" class="color-success"></fa-icon>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s12 m12 l12 xl12" *ngIf="!sensorStatus">
+              <button type="button" mat-button class="fading-alert" matTooltip="El sensor está desconectado">
+                <fa-icon [icon]="faTools" size=2x></fa-icon><br>
+                Desconectado
+              </button>
+            </div>
+            <div class="col s6 m6 l6 xl6" *ngIf="sensorStatus&&flag===0">
+              <button type="button" mat-button class="fading-glow" matTooltip="Iniciar medición"
+                (click)="initScan()" [disabled]="isDisabled">
+                <fa-icon [icon]="faSatelliteDish" size=2x></fa-icon><br>
+                Escanear
+              </button>
+            </div>
+            <div class="col s6 m6 l6 xl6" *ngIf="sensorStatus&&flag===1">
+              <button type="button" mat-button class="fading-busy" matTooltip="Sensor Ocupado" (click)="initScan()">
+                <fa-icon [icon]="faClock" size=2x></fa-icon><br>
+                Sensor Ocupado
+              </button>
+            </div>
+            <div class="col s6 m6 l6 xl6" *ngIf="sensorStatus">
+              <button type="button" mat-button *ngIf="dimension==3" mat-button matTooltip="Cambiar medición a 2D"
+                (click)="dimension = 2" [disabled]="isDisabled">
+                <fa-icon [icon]=faCube size=2x></fa-icon><br>
+                3D
+              </button>
+              <button type="button" mat-button *ngIf="dimension==2" matTooltip="Cambiar medición a 3D"
+                (click)="dimension = 3" [disabled]="isDisabled">
+                <fa-icon [icon]=faSquare size=2x></fa-icon><br>
+                2D
+              </button>
+            </div>
+          </div>
+        </mat-card-content>  
+      </mat-card>
+      <mat-card >
+        <mat-card-content> 
+          <mat-card-title>ALTURAS MÁXIMAS&nbsp;<fa-icon [icon]="faShip" size=1x></fa-icon></mat-card-title>
+          <div class="row" > 
+            <mat-list #list *ngFor="let ferry of ferries">  
+              <mat-list-item >
+                <div matLine >
+                  <div class="col s6 m6 l9 xl5" style="padding: 0px;">
+                    <span style="float: left"><b>{{ ferry.name }}</b></span>
+                  </div>
+                  <div class="col s4 m5 l2 xl4" *ngIf="ferry.max_height" >
+                    <span style="float: right;">{{ ferry.max_height }}<small>(m)</small></span>  
+                  </div>  
+                  <div class="col s2 m1 l1 xl3" style="padding-left: 0px;" *ngIf="ferry.max_height">
+                    <fa-icon [ngClass]="{ 'color-success' : (ferry.max_height >= alto), 'color-danger' : (ferry.max_height < alto) }" size=1x [icon]="faCheckCircle"></fa-icon>
+                  </div>
+                  <div class="col s6 m12 l12 xl12" style="padding: 0px;">
+                    <div *ngIf="ferry.ferry_decks">
+                      <mat-list #list *ngFor="let ferry_deck of ferry.ferry_decks" >
+                          <div matLine >
+                            <div class="col s5 m6 l7 xl5">
+                              <span style="float:left"><h5>&nbsp;&nbsp;{{ ferry_deck.name }}</h5></span>
+                            </div>  
+                            <div class="col s4 m5 l4 xl4">
+                              <span style="float:right"><h5>{{ ferry_deck.max_height }}<small>(m)</small></h5></span>
+                            </div>
+                            <div class="col s3 m1 l1 xl3" style="padding-left: 0px;">
+                              <fa-icon [ngClass]="{ 'color-success' : (ferry_deck.max_height >= alto), 'color-danger' : (ferry_deck.max_height < alto) }" size=1x [icon]="faCheckCircle"></fa-icon>
+                            </div>  
+                          </div>  
+                      </mat-list>  
+                    </div>  
+                  </div>
+                </div>
+              </mat-list-item>
+            </mat-list> 
+          </div>  
+        </mat-card-content>
+      </mat-card> 
+    </div>
+    <!-- SCAN -->
+    <div class="col s8 m8 l8 xl8" (mouseover)="zoomCamera($event)">
+      <app-scan [ancho]="ancho" [alto]="alto" [largo]="largo" [volumen]="volumen" [peso]="peso" 
+      [scanParams]="scanParams" [current_login]='login' [chartUpdate]="chartUpdate" [chartOptions]="chartOptions">
+      </app-scan>
+    </div>
+    <div class="col s12 m2 l2 xl2">
+      <app-camera (zoomCamera)="zoomCamera($event)"></app-camera>
+    </div>  
+  </div>
+  <div [hidden]="!isDisabled">
+    <div class="row" class="centered"> 
+      <mat-progress-spinner class="centered" [color]="(progress_percentage<=50) ? 'warn' : 'accent'" [diameter]="190" alt="Waiting for scan..." [value]="progress_percentage"></mat-progress-spinner>
+      <div style="display: grid;">
+          <h1 style="margin:auto">{{ progress_percentage }}%</h1>
+          <p><span class="fading-busy">Escaneando...</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="zoomedCamera" [hidden]="!zoomedCamera">
+    <canvas #streamingZ id="canvasZ" style="width: 100%;"></canvas>
+  </div>
+</app-main-nav>

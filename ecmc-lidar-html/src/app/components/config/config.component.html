@@ -1,0 +1,25 @@
+<app-main-nav [notifications]="notifications" (clear_title)="clear_title()">
+  <mat-tab-group mat-stretch-tabs >
+    <mat-tab label="Datos Históricos">
+      <app-historic-config></app-historic-config>
+    </mat-tab>
+    <mat-tab label="Viajes">
+      <app-travel-config></app-travel-config>
+    </mat-tab>
+    <mat-tab label="Tipos de Equipo" *ngIf="login.category<=1">
+      <app-load-type-config [current_login]='login'></app-load-type-config>
+    </mat-tab>
+    <mat-tab label="Dice tener" *ngIf="login.category<=1">
+      <app-dice-tener-config [current_login]='login'></app-dice-tener-config>
+    </mat-tab>  
+    <mat-tab label="Administración de Clientes" *ngIf="login.category<=1">
+      <app-customer-config></app-customer-config>
+    </mat-tab>  
+    <mat-tab label="Administración de Usuarios" *ngIf="login.category<=1">
+      <app-user-config></app-user-config>
+    </mat-tab>  
+    <mat-tab label="Información del Sistema" *ngIf="login.category<=1">
+      <app-system-config></app-system-config>
+    </mat-tab>
+  </mat-tab-group>
+</app-main-nav>

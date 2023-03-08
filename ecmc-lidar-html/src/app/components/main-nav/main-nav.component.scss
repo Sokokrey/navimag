@@ -1,0 +1,116 @@
+@import '../../../saut';
+
+.sidenav-container {
+  height: 100%;
+  overflow-y: hidden;
+}
+
+mat-toolbar{
+  position: sticky;
+  position: -webkit-sticky; /* For macOS/iOS Safari */
+  top: 0; /* Sets the sticky toolbar to be on top */
+  z-index: 1000; /* Ensure that your app's content doesn't overlap the toolbar */
+}
+
+mat-sidenav-container {
+  background-color: $body-background;
+}
+
+.mat-drawer-content{
+  overflow: hidden;
+}
+
+#user-section{
+  table{
+    width: 100%;
+    margin: 0px;
+    height: 64px;
+    padding-left: 14px;
+  }
+}
+section#sys-info{
+  height: 67px;
+  table{
+    margin-top: 0px;
+    background: transparent;
+    height: auto;
+    text-align: left;
+    font-size: 8px;
+    line-height: 17px;
+    tr{
+      th,td{
+        height: auto;
+      }
+    }
+  }
+}
+.mat-list-base{
+  padding-top: 0px;
+}
+
+::ng-deep .mat-menu-panel{
+  max-width: 650px !important;
+}
+.example-spacer {
+  flex: 1 1 auto;
+}
+.scrollbar {
+    float: left;
+    overflow-y: scroll;
+    width: 100%;
+    height: 92%;
+}
+
+.force-overflow {
+    min-height: 450px;
+}
+#style-1::-webkit-scrollbar {
+    width: 6px;
+    background-color: transparent;
+} 
+#style-1::-webkit-scrollbar-thumb {
+    background-color: $menu-background;
+}
+
+.sombrita {
+  margin: 0;
+  padding-bottom: 6rem;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  color: white;
+  text-transform: uppercase;
+  animation: glow 2s ease-in-out infinite alternate;
+  text-align: center;
+}
+
+.peligro {
+  margin: 0;
+  padding-bottom: 6rem;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  color: white;
+  text-transform: uppercase;
+  animation: alert 0.5s ease-in-out infinite alternate;
+  text-align: center;
+}
+
+@keyframes alert {
+  from {
+    text-shadow: 0 0 20px rgb(255, 91, 91);
+  }
+  to {
+    text-shadow: 0 0 30px #e21111, 0 0 10px #ff5a5a;
+    color: #ff0000;
+  }
+}
+@keyframes glow {
+  from {
+    text-shadow: 0 0 20px white;
+  }
+  to {
+    text-shadow: 0 0 30px #15bf15, 0 0 10px #81eb81;
+    color: #81eb81;
+  }
+}

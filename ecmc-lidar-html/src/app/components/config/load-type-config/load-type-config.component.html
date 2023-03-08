@@ -1,0 +1,134 @@
+<div class="row" [style.margin-top]="'10px'">
+  <div class="col s12 m8 l8 xl8">
+  <!-- LOAD TYPE FORM -->
+    <div class="col s6 m3 l4 xl4"> 
+      <mat-form-field>
+        <input matInput type="text" placeholder="Tipo de Equipo" [(ngModel)]="load_type.name">
+      </mat-form-field>
+    </div>
+    <div class="col s6 m4 l5 xl5"> 
+      <mat-form-field>
+        <mat-label>Categoría</mat-label>
+        <mat-select [(ngModel)]="load_type.category">
+          <mat-option  *ngFor="let load_category of loadCategoryList" [value]="load_category.name" >{{ load_category.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col s2 m1 l1 xl2">
+      <button mat-raised-button (click)="updateLoadType ? updLoadType() : addLoadType()"
+        class="circle-8 transparent color-primary">
+        <fa-icon [icon]="faSave"></fa-icon>
+      </button>
+    </div>
+    <div class="col s2 m1 l1 xl2"> 
+      <button mat-raised-button (click)="resetLoadType()" class="circle-8 transparent color-info">
+        <fa-icon [icon]="faBan"></fa-icon>
+      </button>
+    </div>
+    <div class="col s12 m12 l12 xl12">
+      <!-- LOAD TYPE TABLE -->
+      <table mat-table [dataSource]="ds_loadTypeList" class="mat-elevation-z8" style="width: 100%;">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let load_type"> {{load_type.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef> Categoría </th>
+          <td mat-cell *matCellDef="let load_type"> {{load_type.category}} </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let load_type">
+            <button mat-raised-button (click)="delLoadType(load_type)" class="circle-8 transparent color-danger">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+            <button mat-raised-button (click)="getLoadTypeDetail(load_type)" class="circle-8 transparent color-warning">
+              <fa-icon [icon]="faEdit"></fa-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['name', 'category', 'actions']">
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: ['name', 'category', 'actions'];"></tr>
+      </table>
+    </div>
+  </div>
+  <div class="col s12 m4 l4 xl4" *ngIf="load_type._id" [style.margin-top]="'5px'">
+  <!-- LOAD FORM -->
+    <div class="col s6 m4 l5 xl5"> 
+      <mat-form-field>
+        <input matInput type="text" placeholder="Equipo" [(ngModel)]="load.name">
+      </mat-form-field>
+    </div>
+    <div class="col s2 m2 l5 xl5">
+      <button mat-raised-button (click)="addLoad()" class="circle-8 transparent color-primary">
+        <fa-icon [icon]="faSave"></fa-icon>
+      </button>
+    </div>
+    <div class="col s2 m2 l5 xl5">
+      <button mat-raised-button (click)="resetLoad()" class="circle-8 transparent color-info">
+        <fa-icon [icon]="faBan"></fa-icon>
+      </button>
+    </div>
+    <div class="col s12 m12 l12 xl12">
+      <!-- LOAD TABLE -->
+      <table mat-table [dataSource]="ds_loadList" class="mat-elevation-z8" style="width: 100%;">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let load"> {{load.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let load">
+            <button mat-raised-button (click)="delLoad(load)" class="circle-8 transparent color-danger">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['name','actions']">
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: ['name','actions'];"></tr>
+      </table>
+    </div>
+  </div>  
+  <div class="col s12 m4 l4 xl4" [style.margin-top]="'10px'">
+    <div class="col s6 m4 l5 xl5"> 
+      <mat-form-field>
+        <input matInput type="text" placeholder="Categoría" [(ngModel)]="load_category.name">
+      </mat-form-field>
+    </div>
+    <div class="col s2 m2 l5 xl5">
+      <button mat-raised-button (click)="updateLoadCategory ? updLoadCategory() : addLoadCategory()" class="circle-8 transparent color-primary">
+        <fa-icon [icon]="faSave"></fa-icon>
+      </button>
+    </div>
+    <div class="col s2 m2 l5 xl5">
+      <button mat-raised-button (click)="resetLoadCategory()" class="circle-8 transparent color-info">
+        <fa-icon [icon]="faBan"></fa-icon>
+      </button>
+    </div>
+    <div class="col s12 m12 l10 xl10">
+      <!-- LOAD TABLE -->
+      <table mat-table [dataSource]="ds_loadCategoryList" class="mat-elevation-z8" style="width: 100%;">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let load_category"> {{ load_category.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let load_category">
+            <button mat-raised-button (click)="delLoadCategory(load_category)" class="circle-8 transparent color-danger">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+            <button mat-raised-button (click)="getLoadCategoryDetail(load_category)" class="circle-8 transparent color-warning">
+              <fa-icon [icon]="faEdit"></fa-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['name','actions']">
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: ['name','actions'];"></tr>
+      </table>
+    </div>
+  </div>
+</div>

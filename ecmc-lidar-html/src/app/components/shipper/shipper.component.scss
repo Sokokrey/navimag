@@ -1,0 +1,41 @@
+@import './src/saut';
+
+img{
+    height: 130px;
+    opacity: 90%;
+}
+
+img:hover{ 
+    opacity: 100%;
+}
+
+.horizontal { 
+    display: inline;
+ }
+
+.mat-badge-content {
+    width: 48px;
+    height: 37px;
+    font-size: 11px !important;
+    line-height: 40px;
+    margin-left:20px !important;
+    position: absolute;
+}
+
+.travel_num{
+    display: inline;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.travel_badge{
+    position:absolute; 
+    margin-top: -2%; 
+    margin-left: 2%;
+}
+
+.ferry_text{
+    font-family: system-ui !important; 
+    position: relative; 
+    left:5%;
+}

@@ -1,0 +1,320 @@
+<app-main-nav [notifications]="notifications" (clear_title)="clear_title()">
+    <mat-tab-group #tabGroup mat-stretch-tabs (selectedTabChange)="resetAll()">
+        <mat-tab label="Pendientes" >
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <div class="row">
+                        <div class="col s12 m5 l3 xl3">
+                            <mat-card>
+                                <mat-card-title>
+                                    Escoja un viaje: &nbsp;<fa-icon [icon]="faRoute" size=1x></fa-icon>
+                                    <button mat-raised-button class="circle-8 transparent color-primary" (click)="resetAll()" style="float: right">
+                                        <fa-icon [icon]="faBan"></fa-icon>
+                                    </button>
+                                </mat-card-title>
+                                <mat-card-content [style.margin-top]="'32px'">
+                                    <ul style="padding: 0px;" >
+                                        <li *ngFor="let t of pendingTravels, index as i" class="horizontal">
+                                            <h1 class="travel_num"  (click)="getTravelInfo(t)" [ngStyle]="{ 'color' : (t._id.num == travel.num) ? 'blue' : '' }">{{t._id.num}}</h1>
+                                            <span class="travel_badge" matBadge="{{ t.asignados }}/{{ t.totales }}" matBadgeColor="{{ (t.asignados == t.totales) ? 'accent' : 'warn' }}" matBadgeSize="large" matBadgePosition="above" matBadgeOverlap="false"></span> 
+                                            <span style="display: inline;" *ngIf="pendingTravels.length != i + 1"><h3 style="display: inline;" >&nbsp;-&nbsp;</h3></span>
+                                        </li>
+                                    </ul>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                        <div class="col s12 m7 l5 xl5" *ngIf="travel.ferry">
+                            <mat-card>
+                                <mat-card-title>Información del viaje: &nbsp;<fa-icon [icon]="faShip" size=1x></fa-icon>
+                                    <button mat-stroked-button color="white" style="background-color: #28ff0069;" [style.margin-top]="'20px'" [style.margin-left]="'50px'" (click)="exportScansbyTravel()">
+                                        Exportar&nbsp;&nbsp;<fa-icon size="1x" [icon]="faFileExcel"></fa-icon>
+                                    </button>   
+                                    <button *ngIf="allAssignedScans()" mat-stroked-button color="white" style="background-color: #b90000;" [style.margin-left]="'90px'" (click)="embarcarCargas()">
+                                        Zarpe&nbsp;&nbsp;<fa-icon size="1x" [icon]="faShip" ></fa-icon>
+                                    </button> 
+                                </mat-card-title>
+                                <mat-card-content>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col s3 m5 l3 xl3" >
+                                            <img [src]="'assets/img/ship_color.png'">  
+                                            <h1 style="color: {{ ferry.color }};">
+                                                <b class="ferry_text">{{ travel.ferry }}</b>
+                                            </h1>
+                                        </div>
+                                        <div class="col s12 m6 l5 xl5">
+                                            <mat-list #list *ngFor="let card of travelInfo" >
+                                                <mat-list-item style="height: 40px; font-size: 14px;">
+                                                    <div matLine>
+                                                        <p style="float:left;">{{ card.name }}</p>
+                                                        <p style="float:right">{{ card.value }}</p>
+                                                    </div>
+                                                </mat-list-item>
+                                            </mat-list>       
+                                        </div> 
+                                        <div class="col s12 m12 l4 xl4">    
+                                            <highcharts-chart [Highcharts]="embarkChart" [options]="embarkChartOpt" [oneToOne]=true [(update)]="embarkChartUpd" style="width: 100%; display: block;"></highcharts-chart>
+                                        </div>    
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                    </div>
+                    <div class="row" style="display: inline; border:0px">
+                        <div class="col s6 m3 l2 xl2">
+                            <mat-form-field>
+                                <input matInput class="form-field" [formControl]="genericFilter" placeholder="Buscador..." autocomplete="off">
+                            </mat-form-field>
+                        </div>
+                        <fa-icon [icon]="faSearch" size="2x"></fa-icon>
+                        <div class="col s12 m12 l12 xl12">
+                            <table mat-table [dataSource]="ds_scansToAssign">
+                                <ng-container matColumnDef="num">
+                                    <th mat-header-cell *matHeaderCellDef>Nº</th>
+                                    <td mat-cell *matCellDef="let scan; let i = index">{{ i + 1}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="nro_recepcion">
+                                    <th mat-header-cell *matHeaderCellDef>Nº Recepcion</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.nro_recepcion }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="patente">
+                                    <th mat-header-cell *matHeaderCellDef>Patente</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.patente }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="travel">
+                                    <th mat-header-cell *matHeaderCellDef>Viaje</th>
+                                    <td mat-cell *matCellDef="let scan">
+                                        <div class="col s4 m12 l12 xl12">
+                                            <button class="fade" mat-mini-fab [ngStyle]="{ 'background-color': (scan.nro_recepcion == scanSelected) ? '#49c620' : '#d5e5f7d6' }"
+                                            (click)="getTravelInfo(scan.travel); spliceScanFirst(scan.nro_recepcion);">{{ scan.travel.num }}</button>
+                                        </div>  
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="customer_name">
+                                    <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.customer.name }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="customer_rut">
+                                    <th mat-header-cell *matHeaderCellDef>RUT Cliente</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.customer.RUT }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="load_category">
+                                    <th mat-header-cell *matHeaderCellDef>Categoría carga</th>
+                                    <td mat-cell *matCellDef="let scan">
+                                        <span [ngStyle]="{ 'color': (scan.categoria_carga.trim() == 'Menor') ? '#fd2206' : '#70c800' }">
+                                            {{ scan.categoria_carga}}
+                                        </span>    
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="load_type">
+                                    <th mat-header-cell *matHeaderCellDef>Tipo carga</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.tipo_carga }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="load">
+                                    <th mat-header-cell *matHeaderCellDef>Carga</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.carga }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="peso">
+                                    <th mat-header-cell *matHeaderCellDef>Peso (kg)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.peso }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="alto">
+                                    <th mat-header-cell *matHeaderCellDef>Alto (mt)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.alto }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="largo">
+                                    <th mat-header-cell *matHeaderCellDef>Largo (mt)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.largo }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="ancho">
+                                    <th mat-header-cell *matHeaderCellDef>Ancho (mt)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.ancho }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="fecha">
+                                    <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.fecha | date:'dd-MM-y':'UTC' }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="assign">
+                                    <th mat-header-cell *matHeaderCellDef>Asignar
+                                        <mat-select *ngIf="travel.num" placeholder="Ordenar por..." [(ngModel)]="orderScansValue">
+                                            <mat-option (onSelectionChange)="orderScansBy($event)" [value]="1">No asignados</mat-option>
+                                            <mat-option (onSelectionChange)="orderScansBy($event)" [value]="2">Orden de llegada</mat-option>
+                                        </mat-select>
+                                    <td mat-cell *matCellDef="let scan">
+                                        <div class="col s4 m12 l12 xl12" style="margin-top: 5px;" *ngIf="travel.num">
+                                            <mat-form-field class="form-element">
+                                                <mat-select placeholder="Cubierta" [value]="(scan.deck_assign) ? scan.deck_assign.deck.id : ''">
+                                                    <mat-option (onSelectionChange)="assignDeck($event, scan, { id:0, name:'Condicional'})" [value]="0">Condicional</mat-option>
+                                                    <mat-option (onSelectionChange)="assignDeck($event, scan, ferry_deck)" *ngFor="let ferry_deck of ferry.decks" [value]="ferry_deck.id">{{ ferry_deck.name }}</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row
+                                    *matHeaderRowDef="displayColumns"></tr>
+                                <tr mat-row
+                                    *matRowDef="let scan; columns: displayColumns">
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="En Ruta">
+            <div class="row" style="margin-top: 10px;">
+                <div class="col s12 m12 l12 xl12">
+                    <div class="col s12 m3 l3 xl3" >
+                        <div class="col s5 m5 l5 xl5">
+                            <mat-form-field>
+                                <input matInput class="form-field" [formControl]="travelFilter" placeholder="Buscador..." autocomplete="off">
+                            </mat-form-field>
+                        </div>
+                        <div class="col s1 m1 l1 xl1" [style.margin-top]="'10px'">
+                            <fa-icon [icon]="faSearch" size="2x"></fa-icon>
+                        </div>
+                        <table mat-table [dataSource]="ds_embarkedTravels">
+                            <ng-container matColumnDef="travel">
+                                <th mat-header-cell *matHeaderCellDef>Nro Viaje</th>
+                                <td mat-cell *matCellDef="let travel">{{ travel._id.num }}</td>
+                            </ng-container>
+                            <!--
+                            <ng-container matColumnDef="fecha">
+                                <th mat-header-cell *matHeaderCellDef>Fecha de embarcación</th>
+                                <td mat-cell *matCellDef="let travel">{{ travel.fecha | date:'d-MM-y H:m:s':'UTC' }}</td>
+                            </ng-container>-->
+                            <ng-container matColumnDef="actions">
+                                <th mat-header-cell *matHeaderCellDef style="width : 20px">Acciones</th>
+                                <td mat-cell *matCellDef="let travel">
+                                    <button mat-raised-button class="circle-8 transparent color-warning" (click)="getEmbarkedTravelInfo(travel);">
+                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row
+                                *matHeaderRowDef="['travel', 'actions']"></tr>
+                            <tr mat-row
+                                *matRowDef="let travel; columns: ['travel', 'actions']">
+                            </tr>
+                        </table>
+                        <!--<mat-paginator #travelsPaginator [pageSize]="10"></mat-paginator>-->
+                    </div>
+                    <div class="col s12 m9 l9 xl9" *ngIf="embarkedTravelScans.length > 0">
+                        <div class="col s12 m12 l12 xl12" *ngIf="travel.ferry">
+                            <mat-card>
+                                <mat-card-title>Información del viaje: &nbsp;<fa-icon [icon]="faShip" size=1x></fa-icon>
+                                    <button mat-stroked-button color="white" style="background-color: #28ff0069;" [style.margin-top]="'20px'" [style.margin-left]="'50px'" (click)="exportScansbyTravel()">
+                                        Exportar&nbsp;&nbsp;<fa-icon size="1x" [icon]="faFileExcel"></fa-icon>
+                                    </button>   
+                                    <button mat-stroked-button color="white" style="background-color: #b90000;" [style.margin-left]="'90px'" (click)="finishTravel()">
+                                        Finalizar Viaje&nbsp;&nbsp;<fa-icon size="1x" [icon]="faShip" ></fa-icon>
+                                    </button> 
+                                </mat-card-title>
+                                <mat-card-content>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col s3 m3 l3 xl3" >
+                                            <img [src]="'assets/img/ship_color.png'">  
+                                            <h1 style="color: {{ ferry.color }}">
+                                                <b class="ferry_text">{{ travel.ferry }}</b>
+                                            </h1>
+                                        </div>
+                                        <div class="col s5 m5 l5 xl5">
+                                            <mat-list #list *ngFor="let card of travelInfo" >
+                                                <mat-list-item style="height: 40px; font-size: 13px !important;">
+                                                    <div matLine>
+                                                        <p style="float:left;">{{ card.name }}</p>
+                                                        <p style="float:right">{{ card.value }}</p>
+                                                    </div>
+                                                </mat-list-item>
+                                            </mat-list>       
+                                        </div> 
+                                        <div class="col s4 m4 l4 xl4">    
+                                            <highcharts-chart [Highcharts]="embarkChart" [options]="embarkChartOpt" [oneToOne]=true [(update)]="embarkChartUpd" style="width: 100%; display: block;"></highcharts-chart>
+                                        </div>    
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                        <div class="col s12 m12 l12 xl12" *ngIf="travel.ferry">
+                            <div class="col s2 m2 l2 xl2">
+                                <mat-form-field>
+                                    <input matInput class="form-field" [formControl]="genericFilter" placeholder="Buscador..." autocomplete="off">
+                                </mat-form-field>
+                            </div>
+                            <div class="col s1 m1 l1 xl1" [style.margin-top]="'10px'">
+                                <fa-icon [icon]="faSearch" size="2x"></fa-icon>
+                            </div>
+                            <table mat-table [dataSource]="ds_embarkedTravelScans">
+                                <ng-container matColumnDef="nro_recepcion">
+                                    <th mat-header-cell *matHeaderCellDef>Nro Recepcion</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.nro_recepcion }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="patente">
+                                    <th mat-header-cell *matHeaderCellDef>Patente</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.patente }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="customer_name">
+                                    <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.customer.name }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="customer_rut">
+                                    <th mat-header-cell *matHeaderCellDef>RUT Cliente</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.customer.RUT }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="load_category">
+                                    <th mat-header-cell *matHeaderCellDef>Categoría carga</th>
+                                    <td mat-cell *matCellDef="let scan">
+                                        <span [ngStyle]="{ 'color': (scan.tipo_carga.trim() == 'VEHICULO') ? '#fd2206' : '#70c800' }">
+                                            {{ (scan.tipo_carga.trim() == 'VEHICULO') ? 'Menor' : 'Mayor'}}
+                                        </span>    
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="load_type">
+                                    <th mat-header-cell *matHeaderCellDef>Tipo carga</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.tipo_carga }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="load">
+                                    <th mat-header-cell *matHeaderCellDef>Carga</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.carga }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="peso">
+                                    <th mat-header-cell *matHeaderCellDef>Peso (kg)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.peso }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="alto">
+                                    <th mat-header-cell *matHeaderCellDef>Alto (mt)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.alto }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="largo">
+                                    <th mat-header-cell *matHeaderCellDef>Largo (mt)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.largo }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="ancho">
+                                    <th mat-header-cell *matHeaderCellDef>Ancho (mt)</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.ancho }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="terminal_destino">
+                                    <th mat-header-cell *matHeaderCellDef>Cubierta</th>
+                                    <td mat-cell *matCellDef="let scan">{{ scan.deck_assign.deck.name }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="actions">
+                                    <th mat-header-cell *matHeaderCellDef style="width : 20px">Acciones</th>
+                                    <td mat-cell *matCellDef="let travel">
+                                        <button mat-raised-button class="circle-8 transparent color-warning" (click)="getTravelInfo(travel)">
+                                            <fa-icon [icon]="faEdit"></fa-icon>
+                                        </button>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row
+                                    *matHeaderRowDef="['nro_recepcion','patente','customer_name','customer_rut','load_category','load_type','load','peso', 'alto','largo', 'ancho', 'terminal_destino']"></tr>
+                                <tr mat-row
+                                    *matRowDef="let scan; columns: ['nro_recepcion','patente','customer_name','customer_rut','load_category','load_type','load','peso', 'alto','largo', 'ancho', 'terminal_destino']">
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</app-main-nav>

@@ -1,0 +1,118 @@
+<div class="row">
+    <div class="col s12 m12 l12 xl12">
+        <div class="col s2 m2 l2 xl2">
+            <mat-form-field>
+                <input matInput class="form-field" [formControl]="nroRecepcionFilter" placeholder="Filtro por n° de recepcion" autocomplete="off">
+            </mat-form-field>
+        </div>
+        <div class="col s2 m2 l2 xl2">
+            <mat-form-field>
+                <input matInput class="form-field" [formControl]="patenteFilter" placeholder="Filtro por patente" autocomplete="off">
+            </mat-form-field>
+        </div>
+        <div class="col s2 m2 l2 xl2">
+            <mat-form-field>
+                <input matInput type="number" class="form-field" [formControl]="travelNumFilter" placeholder="Filtro por n° de viaje" autocomplete="off">
+            </mat-form-field>
+            <button mat-stroked-button color="primary" (click)="searchtravel(travelNumFilter.value)">Exportar
+                <fa-icon size="1x" [icon]="faFileExcel"></fa-icon></button> 
+        </div>
+        <div class="col s2 m2 l2 xl2">
+            <mat-form-field><mat-label>Buscar entre fechas</mat-label>
+                <mat-date-range-input [rangePicker]="picker" [formGroup]="range"  [max]="tomorrow">
+                    <input matStartDate formControlName="start" placeholder="Start date">
+                    <input matEndDate formControlName="end" placeholder="End date">
+                </mat-date-range-input>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                
+                <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+                <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+            </mat-form-field>
+            <button mat-stroked-button color="primary" (click)="searchrange()">Exportar
+                <fa-icon size="1x" [icon]="faFileExcel"></fa-icon></button>        
+        </div>
+
+        <div class="col s12 m12 l12 xl12">
+            <table id="Reporte_scan" mat-table [dataSource]="ds_historicScans">
+                <ng-container matColumnDef="nro_recepcion">
+                    <th mat-header-cell *matHeaderCellDef>Nro Recepcion</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.nro_recepcion }}</td>
+                </ng-container>
+                <ng-container matColumnDef="patente">
+                    <th mat-header-cell *matHeaderCellDef>Patente</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.patente }}</td>
+                </ng-container>
+                <ng-container matColumnDef="nro_reserva">
+                    <th mat-header-cell *matHeaderCellDef>Nro Reserva</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.nro_reserva == 0 ? 'S/R' : scan.nro_reserva }}</td>
+                </ng-container>
+                <ng-container matColumnDef="travel" style="width: 100px;">
+                    <th mat-header-cell *matHeaderCellDef>Nro de Viaje</th>
+                    <td mat-cell *matCellDef="let scan">
+                        <div class="col s4 m12 l12 xl12" style="display: inline; width: 60%;">
+                            <div class="col s4 m10 l10 xl10" [style.margin-top]="'12px'">
+                                <input matInput type="number" [value]="scan.travel.num" (input)="scan.travel.new_travel = $event.target.value" placeholder="Ingresar viaje" autocomplete="off" style="float:center">
+                            </div>
+                            <div class="col s4 m2 l2 xl2" *ngIf="existTravel(scan)">
+                                <button mat-raised-button class="circle-8 transparent color-primary" (click)="changeScanTravel(scan)">
+                                    <fa-icon [icon]="faSave"></fa-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="peso">
+                    <th mat-header-cell *matHeaderCellDef>Peso (kg)</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.peso }}</td>
+                </ng-container>
+                <ng-container matColumnDef="alto">
+                    <th mat-header-cell *matHeaderCellDef>Alto (mt)</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.alto }}</td>
+                </ng-container>
+                <ng-container matColumnDef="largo">
+                    <th mat-header-cell *matHeaderCellDef>Largo (mt)</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.largo }}</td>
+                </ng-container>
+                <ng-container matColumnDef="ancho">
+                    <th mat-header-cell *matHeaderCellDef>Ancho (mt)</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.medidas.ancho }}</td>
+                </ng-container>
+                <ng-container matColumnDef="fecha">
+                    <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.fecha | date:'dd-MM-y':'UTC' }}</td>
+                </ng-container>
+                <ng-container matColumnDef="hora">
+                    <th mat-header-cell *matHeaderCellDef>Hora</th>
+                    <td mat-cell *matCellDef="let scan">{{ scan.hora }}</td>
+                </ng-container>
+                <ng-container matColumnDef="actions" >
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td mat-cell *matCellDef="let scan">
+                        <button mat-icon-button class="color-primary" (click)="generatePdf(scan._id, 2)" matTooltip="Descargar reporte">
+                            <fa-icon size="2x" [icon]="faFilePdf"></fa-icon>
+                        </button>
+                        <button mat-icon-button class="color-warning" (click)="showGallery(scan._id)" matTooltip="Mostrar fotos">
+                            <fa-icon size="2x" [icon]="faImages"></fa-icon>
+                        </button>
+                        
+                        <button *ngIf="login.category<=1" style="float: right;" mat-raised-button class="circle-8 transparent color-danger" (click)="delScan(scan)" matTooltip="Eliminar Registro: {{ scan.nro_recepcion }}" >
+                            <fa-icon [icon]="faTrash"></fa-icon>
+                        </button>
+
+                        <span *ngIf="login.category<=1" style="float: right; margin-right: 30px;">
+                            Recepcionado por: {{ scan.user }}
+                        </span>
+                    </td>
+                </ng-container>    
+                <tr mat-header-row
+                    *matHeaderRowDef="displayColumns"></tr>
+                <tr mat-row
+                    *matRowDef="let scan; columns: displayColumns">
+                </tr>
+            </table>
+            <mat-paginator #scanPaginator [pageSize]="100"></mat-paginator>
+        </div> 
+    </div>
+    <mat-spinner style="position: absolute; top: 43%; left: 45%" *ngIf="hideSpinner"></mat-spinner>
+</div>
