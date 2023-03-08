@@ -1,0 +1,49 @@
+{
+  "name": "ecmc-lidar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -w",
+    "dev": "nodemon build/index.js",
+    "update": "tsc",
+    "start": "pm2 start build/index.js --name ecmc-backend",
+    "stop": "pm2 stop ecmc-backend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/jsonwebtoken": "^8.5.1",
+    "bcrypt": "^4.0.1",
+    "child_process": "^1.0.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^3.21.3",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.27.0",
+    "mongoose": "^5.9.4",
+    "morgan": "^1.9.1",
+    "mosca": "^2.8.3",
+    "mqtt": "^3.0.0",
+    "node-rtsp-recorder": "^1.0.3",
+    "request": "^2.88.2",
+    "socket.io": "^2.3.0",
+    "ws": "^7.2.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.3",
+    "@types/helmet": "0.0.45",
+    "@types/mongoose": "^5.7.6",
+    "@types/morgan": "^1.9.0",
+    "@types/mosca": "^2.8.3",
+    "@types/node": "^13.9.1",
+    "@types/request": "^2.48.4",
+    "@types/socket.io": "^2.1.4",
+    "@types/ws": "^7.2.3",
+    "nodemon": "^2.0.2",
+    "typescript": "^3.8.3"
+  }
+}
