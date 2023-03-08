@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="shortcut icon" href="#">
+</head>
+
+<body style="background: none transparent;">
+    <div class="row">
+        <div class="col12">
+            <canvas width="640" height="480" id="canvas"></canvas>
+            <canvas width="640" height="480" id="canvas2"></canvas>
+            <canvas width="640" height="480" id="canvas3"></canvas>
+        </div>
+        <div class="col12">
+            <canvas width="640" height="480" id="canvas4"></canvas>
+            <canvas width="640" height="480" id="canvas5"></canvas>
+            <canvas width="640" height="480" id="canvas6"></canvas>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="jsmpeg.min.js"></script>
+<script type="text/javascript">
+    var canvas = document.getElementById('canvas');
+    var videoUrl = 'ws://localhost:9034/';
+    var player = new JSMpeg.Player(videoUrl, { canvas: canvas, autoplay: true, audio: true, loop: true });
+
+    var canvas2 = document.getElementById('canvas2');
+    var videoUrl2 = 'ws://localhost:9200/';
+    var player2 = new JSMpeg.Player(videoUrl2, { canvas: canvas2, autoplay: true, audio: true, loop: true });
+
+    var canvas3 = document.getElementById('canvas3');
+    var videoUrl3 = 'ws://localhost:9035/';
+    var player3 = new JSMpeg.Player(videoUrl3, { canvas: canvas3, autoplay: true, audio: true, loop: true });
+
+    var canvas4 = document.getElementById('canvas4');
+    var videoUrl4 = 'ws://localhost:9036/';
+    var player4 = new JSMpeg.Player(videoUrl4, { canvas: canvas4, autoplay: true, audio: true, loop: true });
+
+    var canvas5 = document.getElementById('canvas5');
+    var videoUrl5 = 'ws://localhost:9037/';
+    var player5 = new JSMpeg.Player(videoUrl5, { canvas: canvas5, autoplay: true, audio: true, loop: true });
+
+</script>
+
+</html>

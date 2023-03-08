@@ -1,0 +1,1 @@
+[{"_id":{"$oid":"5ee6f7deaec5d11d7c89a18c"},"name":"Chacabuco","default":{"$numberLong":"0"}},{"_id":{"$oid":"5ee6f7deaec5d11d7c89a18d"},"name":"Puerto Montt","default":{"$numberLong":"1"}},{"_id":{"$oid":"5ee6f7deaec5d11d7c89a18e"},"name":"Puerto Natales","default":{"$numberLong":"0"}}]
